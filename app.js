@@ -1,45 +1,86 @@
-// متغیر کمکی برای جلوگیری از تداخل نام
+// متغیرهای اصلی
 let allMeds = [];
+let currentFilter = 'all';
+
+// یک دیکشنری هوشمند برای فیلتر کردن کلمات مشابه
+const filterKeywords = {
+  'مسکن': ['مسکن', 'درد', 'التهاب', 'تب', 'آرتروز'],
+  'عفونت': ['عفونت', 'آنتی‌بیوتیک', 'باکتری', 'قارچ', 'ویروس', 'چرکی'],
+  'قلب': ['قلب', 'فشار', 'عروق', 'خون', 'سکته'],
+  'معده': ['معده', 'گوارش', 'روده', 'اسهال', 'تهوع', 'یبوست', 'نفخ', 'اسید'],
+  'حساسیت': ['حساسیت', 'آلرژی', 'خارش', 'هیستامین', 'عطسه'],
+  'ویتامین': ['ویتامین', 'مکمل', 'آهن', 'کلسیم', 'زینک', 'تغذیه']
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-  // خواندن امن داده‌ها
   allMeds = window.medications || (typeof medications !== 'undefined' ? medications : []);
-
+  
   if (allMeds.length === 0) {
-    console.error("⚠️ داده‌های دارو لود نشد!");
     document.getElementById('medList').innerHTML = `<p style="text-align:center; padding:20px; color:red;">خطا در بارگذاری دیتابیس!</p>`;
   } else {
     renderList(allMeds);
   }
   
-  checkFirstVisit();
-  
-  // اعمال حالت تاریک در صورت ذخیره قبلی
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
   }
+
+  setupFilters();
 });
 
-// نمایش هشدار اول بار ورود
-function checkFirstVisit() {
-  if (!localStorage.getItem('disclaimerAccepted')) {
-    document.getElementById('disclaimerModal').classList.remove('hidden');
-  }
-}
-
-function acceptDisclaimer() {
-  localStorage.setItem('disclaimerAccepted', 'true');
-  document.getElementById('disclaimerModal').classList.add('hidden');
-}
-
-// تغییر تم (حالت شب و روز)
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
-  const isDark = document.body.classList.contains('dark-mode');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
 }
 
-// رندر کردن لیست داروها در صفحه اصلی
+// دکمه‌های فیلتر سریع
+function setupFilters() {
+  const btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // استفاده از currentTarget تا اگر روی ایموجی هم کلیک شد کار کند
+      btns.forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      
+      currentFilter = e.currentTarget.getAttribute('data-filter');
+      applySearchAndFilter();
+    });
+  });
+}
+
+// گوش دادن به تایپ در کادر جستجو
+document.getElementById('searchInput').addEventListener('input', () => {
+  applySearchAndFilter();
+});
+
+// تابع مرکزی که ترکیب سرچ، دکمه‌ها و علاقه‌مندی‌ها را مدیریت می‌کند
+function applySearchAndFilter() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  
+  const filtered = allMeds.filter(med => {
+    // ۱. بررسی تطابق با متن سرچ شده
+    const matchesSearch = med.en_name.toLowerCase().includes(query) || 
+                          med.fa_name.toLowerCase().includes(query) || 
+                          (med.fa_desc && med.fa_desc.toLowerCase().includes(query));
+    
+    // ۲. بررسی دکمه فیلتر انتخاب شده
+    let matchesFilter = true;
+    
+    if (currentFilter === 'favorites') {
+      matchesFilter = isFavorite(med.id);
+    } 
+    else if (currentFilter !== 'all') {
+      const keywords = filterKeywords[currentFilter] || [currentFilter];
+      // اگر حداقل یکی از کلمات کلیدی در توضیحات دارو باشد، آن را نشان بده
+      matchesFilter = keywords.some(kw => med.fa_desc && med.fa_desc.includes(kw));
+    }
+    
+    return matchesSearch && matchesFilter;
+  });
+  
+  renderList(filtered);
+}
+
 function renderList(data) {
   const list = document.getElementById('medList');
   list.innerHTML = '';
@@ -51,51 +92,53 @@ function renderList(data) {
 
   data.forEach(med => {
     const card = document.createElement('div');
-    card.className = 'card'; // کلاس تعریف شده در CSS
+    card.className = 'card'; 
     card.onclick = () => showDetail(med);
     card.innerHTML = `
       <div>
         <div class="en-title">${med.en_name}</div>
         <div class="fa-title">${med.fa_name}</div>
       </div>
-      <div style="font-size: 1.2rem; color: var(--primary);">←</div>
+      <button onclick="event.stopImmediatePropagation(); toggleFavorite(${med.id});" 
+              style="background:none; border:none; font-size:1.6rem; cursor:pointer;">
+        ${isFavorite(med.id) ? '❤️' : '♡'}
+      </button>
     `;
     list.appendChild(card);
   });
 }
 
-// فیلتر کردن و جستجو
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase().trim();
-  const filtered = allMeds.filter(med =>
-    med.en_name.toLowerCase().includes(query) ||
-    med.fa_name.toLowerCase().includes(query) ||
-    (med.fa_desc && med.fa_desc.toLowerCase().includes(query))
-  );
-  renderList(filtered);
-});
+// سیستم علاقه‌مندی‌ها
+function toggleFavorite(id) {
+  let favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+  if (favs.includes(id)) {
+    favs = favs.filter(f => f !== id);
+  } else {
+    favs.push(id);
+  }
+  localStorage.setItem('favorites', JSON.stringify(favs));
+  applySearchAndFilter(); // برای آپدیت فوری صفحه
+}
 
-// نمایش جزئیات دارو
+function isFavorite(id) {
+  const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+  return favs.includes(id);
+}
+
 function showDetail(med) {
   document.getElementById('main-view').classList.add('hidden');
   document.getElementById('detail-view').classList.remove('hidden');
   document.getElementById('det-en').innerText = med.en_name;
   document.getElementById('det-fa').innerText = med.fa_name;
-  document.getElementById('det-desc').innerText = med.fa_desc || 'توضیحاتی برای این دارو ثبت نشده است.';
+  document.getElementById('det-desc').innerText = med.fa_desc || 'توضیحاتی ثبت نشده است.';
   window.scrollTo(0, 0);
 }
 
-// بازگشت به لیست اصلی
 function goBack() {
   document.getElementById('main-view').classList.remove('hidden');
   document.getElementById('detail-view').classList.add('hidden');
 }
 
-// ثبت سرویس ورکر برای حالت آفلاین (PWA)
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.error("SW Registration Failed:", err));
+  navigator.serviceWorker.register('sw.js').catch(err => console.error(err));
 }
-
-
