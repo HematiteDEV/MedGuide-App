@@ -7,6 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#047857">
   <style>
+    /* متغیرهای رنگی برای حالت روز و شب */
     :root {
       --bg-main: #f4f4f5;
       --bg-card: #ffffff;
@@ -24,11 +25,24 @@
       --border: #3f3f46;
       --primary: #047857;
     }
-    body { font-family: Tahoma, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; transition: background 0.3s; }
     
-    .app-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+    body { 
+      font-family: Tahoma, Arial, sans-serif; 
+      background: var(--bg-main); 
+      color: var(--text-main); 
+      margin: 0; 
+      padding: 0; 
+      transition: background 0.3s; 
+    }
     
-    /* سربرگ */
+    /* ظرف اصلی برای هماهنگی عرض سربرگ و محتوا */
+    .app-container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      padding: 15px; 
+    }
+    
+    /* استایل سربرگ: لبه‌های گرد و وسط‌چین */
     header { 
       background: var(--primary); 
       color: white; 
@@ -38,9 +52,10 @@
       position: relative;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    header h1 { margin: 0; font-size: 1.9rem; font-weight: bold; letter-spacing: 1px;}
+    header h1 { margin: 0; font-size: 2rem; font-weight: bold; letter-spacing: 1px;}
     header p { margin: 5px 0 0 0; color: #a7f3d0; font-size: 1rem; }
     
+    /* دکمه تم در سمت چپ سربرگ */
     .theme-btn { 
       position: absolute; 
       left: 15px; 
@@ -67,14 +82,13 @@
     }
     input[type="text"]:focus { border-color: var(--primary-light); }
 
-    /* دکمه‌های فیلتر سریع */
+    /* دکمه‌های فیلتر افقی */
     .filter-container { 
       display: flex; 
       gap: 8px; 
       margin-top: 15px; 
       overflow-x: auto; 
       padding-bottom: 5px;
-      /* مخفی کردن اسکرول‌بار */
       -ms-overflow-style: none;  
       scrollbar-width: none;  
     }
@@ -97,7 +111,7 @@
       border-color: var(--primary); 
     }
 
-    /* لیست داروها */
+    /* کارت‌های لیست داروها */
     #medList { margin-top: 15px; display: grid; gap: 12px; }
     .card { 
       background: var(--bg-card); 
@@ -111,8 +125,24 @@
     }
     .en-title { font-weight: bold; font-size: 1.15rem; }
     .fa-title { color: var(--primary-light); font-size: 1.1rem; margin-top: 5px; }
+
+    /* فوتر توسعه‌دهنده */
+    .dev-footer { 
+      text-align: center; 
+      margin-top: 35px; 
+      padding-top: 15px; 
+      padding-bottom: 25px;
+      font-size: 0.9rem; 
+      color: var(--text-mut); 
+      border-top: 1px dashed var(--border); 
+    }
+    .dev-footer a { 
+      color: var(--primary-light); 
+      text-decoration: none; 
+      font-weight: bold; 
+    }
     
-    /* صفحه جزئیات */
+    /* صفحه جزئیات دارو */
     .hidden { display: none !important; }
     #detail-view { padding: 10px 0; }
     .back-btn { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1.1rem; padding: 0;}
@@ -135,15 +165,20 @@
       
       <div class="filter-container" id="filterContainer">
         <button class="filter-btn active" data-filter="all">همه داروها</button>
+        <button class="filter-btn" data-filter="favorites">❤️ نشان‌شده‌ها</button>
         <button class="filter-btn" data-filter="مسکن">💊 مسکن و درد</button>
         <button class="filter-btn" data-filter="عفونت">🦠 آنتی‌بیوتیک</button>
         <button class="filter-btn" data-filter="قلب">🫀 قلب و فشار خون</button>
         <button class="filter-btn" data-filter="معده">🤢 گوارش و معده</button>
-        <button class="filter-btn" data-filter="حساسیت">🤧 حساسیت و آلرژی</button>
-        <button class="filter-btn" data-filter="ویتامین">🍏 ویتامین و مکمل</button>
+        <button class="filter-btn" data-filter="حساسیت">🤧 حساسیت</button>
+        <button class="filter-btn" data-filter="ویتامین">🍏 تقویتی</button>
       </div>
 
       <div id="medList"></div>
+
+      <div class="dev-footer">
+        توسعه داده شده با ❤️ توسط <a href="https://github.com/HematiteDEV" target="_blank">HematiteDev</a>
+      </div>
     </div>
 
     <div id="detail-view" class="hidden">
