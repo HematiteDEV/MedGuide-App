@@ -8,14 +8,13 @@
   <meta name="theme-color" content="#047857">
   <style>
     :root {
-      --bg-main: #fafafa;
+      --bg-main: #f4f4f5;
       --bg-card: #ffffff;
       --text-main: #18181b;
       --text-mut: #52525b;
       --border: #e4e4e7;
       --primary: #047857;
       --primary-light: #10b981;
-      --header-text: #d1fae5;
     }
     body.dark-mode {
       --bg-main: #18181b;
@@ -25,80 +24,97 @@
       --border: #3f3f46;
       --primary: #047857;
     }
-    body { font-family: system-ui, -apple-system, Tahoma, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; transition: background 0.3s; }
-    .hidden { display: none !important; }
-    .max-w { max-width: 650px; margin: 0 auto; position: relative; }
+    body { font-family: Tahoma, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; transition: background 0.3s; }
     
-    /* Modal */
-    #disclaimerModal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 50; }
-    .modal-content { background: var(--bg-card); padding: 2rem; border-radius: 1rem; width: 85%; text-align: center; }
-    .modal-btn { background: var(--primary); color: white; border: none; padding: 1rem; width: 100%; border-radius: 0.75rem; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 1.5rem; }
+    /* این کلاس باعث می‌شود سربرگ و کادر جستجو هم‌اندازه شوند و از لبه‌های گوشی فاصله بگیرند */
+    .app-container { max-width: 600px; margin: 0 auto; padding: 15px; }
     
-    /* Header */
-    header { background: var(--primary); color: white; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 40; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    header h1 { margin: 0; font-size: 1.5rem; }
-    header p { margin: 0; color: var(--header-text); font-size: 0.875rem; margin-top: 0.25rem; }
-    .theme-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+    /* استایل سربرگ: گرد و وسط‌چین */
+    header { 
+      background: var(--primary); 
+      color: white; 
+      padding: 1.5rem 1rem; 
+      text-align: center; 
+      border-radius: 20px; 
+      position: relative;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    header h1 { margin: 0; font-size: 1.9rem; font-weight: bold; letter-spacing: 1px;}
+    header p { margin: 5px 0 0 0; color: #a7f3d0; font-size: 1rem; }
     
-    /* Search */
-    .search-container { padding: 1rem; position: sticky; top: 72px; background: var(--bg-main); z-index: 30; border-bottom: 1px solid var(--border); }
-    input[type="text"] { width: 100%; padding: 1rem; font-size: 1.1rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); box-sizing: border-box; outline: none; }
+    /* دکمه ماه: شناور در سمت چپ تا متن را از وسط منحرف نکند */
+    .theme-btn { 
+      position: absolute; 
+      left: 15px; 
+      top: 50%; 
+      transform: translateY(-50%); 
+      background: none; 
+      border: none; 
+      font-size: 1.6rem; 
+      cursor: pointer; 
+    }
+
+    /* کادر جستجو */
+    .search-container { margin-top: 15px; }
+    input[type="text"] { 
+      width: 100%; 
+      padding: 1.1rem 1.2rem; 
+      font-size: 1.05rem; 
+      border-radius: 18px; 
+      border: 1px solid var(--border); 
+      background: var(--bg-card); 
+      color: var(--text-main); 
+      box-sizing: border-box; 
+      outline: none;
+    }
     input[type="text"]:focus { border-color: var(--primary-light); }
+
+    /* لیست داروها */
+    #medList { margin-top: 15px; display: grid; gap: 12px; }
+    .card { 
+      background: var(--bg-card); 
+      border: 1px solid var(--border); 
+      border-radius: 16px; 
+      padding: 1.2rem; 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .en-title { font-weight: bold; font-size: 1.15rem; }
+    .fa-title { color: var(--primary-light); font-size: 1.1rem; margin-top: 5px; }
+    .arrow-icon { color: var(--text-mut); font-size: 1.2rem; }
     
-    /* List */
-    #medList { padding: 1rem; display: grid; gap: 0.75rem; padding-bottom: 2rem; }
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; }
-    .en-title { font-weight: bold; font-size: 1.15rem; margin-bottom: 0.25rem;}
-    .fa-title { color: var(--primary-light); font-size: 1.25rem; }
-    .favorite-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; }
-    
-    /* Detail */
-    #detail-view { padding: 1.5rem; }
-    .back-btn { background: none; border: none; color: var(--primary-light); font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; padding: 0; }
-    .detail-card { background: var(--bg-card); border-radius: 1.5rem; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .detail-en { font-size: 1.8rem; font-weight: bold; margin: 0 0 0.5rem 0; }
-    .detail-fa { color: var(--primary-light); font-size: 1.4rem; margin: 0 0 1.5rem 0; font-weight: bold;}
-    .divider { border-top: 1px solid var(--border); margin: 1.5rem 0; }
-    .detail-desc { line-height: 1.9; font-size: 1.1rem; white-space: pre-wrap; }
+    /* صفحه جزئیات دارو */
+    .hidden { display: none !important; }
+    #detail-view { padding: 10px 0; }
+    .back-btn { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1.1rem; padding: 0;}
+    .detail-box { background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); }
   </style>
 </head>
 <body>
 
-  <div id="disclaimerModal" class="hidden">
-    <div class="modal-content">
-      <h2 style="margin-top:0; font-size: 1.5rem;">⚠️ هشدار مهم</h2>
-      <p style="color: var(--text-mut); line-height: 1.8; font-size: 1.1rem;">
-        این اپلیکیشن فقط برای اطلاعات عمومی و آموزشی است.<br>
-        جایگزین نظر پزشک یا داروساز نیست.<br>
-        قبل از مصرف هر دارویی حتماً با متخصص مشورت کنید.
-      </p>
-      <button onclick="acceptDisclaimer()" class="modal-btn">قبول می‌کنم و ادامه می‌دهم</button>
-    </div>
-  </div>
-
-  <div class="max-w">
+  <div class="app-container">
     <header>
-      <div>
-        <h1>MedGuide</h1>
-        <p>دانشنامه آفلاین داروهای ایران • ۵۰۰ دارو</p>
-      </div>
       <button onclick="toggleDarkMode()" class="theme-btn">🌙</button>
+      <h1>MedGuide</h1>
+      <p>دانشنامه آفلاین داروهای ایران</p>
     </header>
 
     <div id="main-view">
       <div class="search-container">
-        <input id="searchInput" type="text" placeholder="جستجو به فارسی یا انگلیسی..." autocomplete="off">
+        <input id="searchInput" type="text" placeholder="جستجوی دارو (فارسی یا انگلیسی)..." autocomplete="off">
       </div>
       <div id="medList"></div>
     </div>
 
     <div id="detail-view" class="hidden">
       <button onclick="goBack()" class="back-btn">← بازگشت به لیست</button>
-      <div class="detail-card">
-        <h2 id="det-en" class="detail-en"></h2>
-        <p id="det-fa" class="detail-fa"></p>
-        <div class="divider"></div>
-        <p id="det-desc" class="detail-desc"></p>
+      <div class="detail-box">
+        <h2 id="det-en" style="margin:0; font-size: 1.8rem;"></h2>
+        <p id="det-fa" style="color: var(--primary-light); font-size: 1.4rem; font-weight: bold; margin: 10px 0;"></p>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
+        <p id="det-desc" style="line-height: 2; font-size: 1.15rem;"></p>
       </div>
     </div>
   </div>
