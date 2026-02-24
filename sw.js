@@ -1,5 +1,5 @@
 // تغییر نام نسخه به v3 برای اعمال اجباری تغییرات ظاهری جدید
-const CACHE_NAME = 'medguide-v9';
+const CACHE_NAME = 'medguide-v10';
 
 const urlsToCache = [
   './',
@@ -37,6 +37,7 @@ self.addEventListener('fetch', event => {
       .then(response => response || fetch(event.request))
   );
 });
+
 
 
 
