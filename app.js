@@ -67,7 +67,7 @@ function renderList(data) {
 // فیلتر کردن و جستجو
 document.getElementById('searchInput').addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase().trim();
-  const filtered = medications.filter(med =>
+  const filtered = allMeds.filter(med =>
     med.en_name.toLowerCase().includes(query) ||
     med.fa_name.toLowerCase().includes(query) ||
     (med.fa_desc && med.fa_desc.toLowerCase().includes(query))
@@ -97,4 +97,5 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.error("SW Registration Failed:", err));
 }
+
 
