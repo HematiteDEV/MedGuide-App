@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedGuide Offline</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#047857">
+  <style>
+    :root {
+      --bg-main: #fafafa;
+      --bg-card: #ffffff;
+      --text-main: #18181b;
+      --text-mut: #52525b;
+      --border: #e4e4e7;
+      --primary: #047857;
+      --primary-light: #10b981;
+      --header-text: #d1fae5;
+    }
+    body.dark-mode {
+      --bg-main: #18181b;
+      --bg-card: #27272a;
+      --text-main: #f4f4f5;
+      --text-mut: #a1a1aa;
+      --border: #3f3f46;
+      --primary: #047857;
+    }
+    body { font-family: system-ui, -apple-system, Tahoma, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; transition: background 0.3s; }
+    .hidden { display: none !important; }
+    .max-w { max-width: 650px; margin: 0 auto; position: relative; }
+    
+    /* Modal */
+    #disclaimerModal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .modal-content { background: var(--bg-card); padding: 2rem; border-radius: 1rem; width: 85%; text-align: center; }
+    .modal-btn { background: var(--primary); color: white; border: none; padding: 1rem; width: 100%; border-radius: 0.75rem; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 1.5rem; }
+    
+    /* Header */
+    header { background: var(--primary); color: white; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 40; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header p { margin: 0; color: var(--header-text); font-size: 0.875rem; margin-top: 0.25rem; }
+    .theme-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+    
+    /* Search */
+    .search-container { padding: 1rem; position: sticky; top: 72px; background: var(--bg-main); z-index: 30; border-bottom: 1px solid var(--border); }
+    input[type="text"] { width: 100%; padding: 1rem; font-size: 1.1rem; border-radius: 1rem; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); box-sizing: border-box; outline: none; }
+    input[type="text"]:focus { border-color: var(--primary-light); }
+    
+    /* List */
+    #medList { padding: 1rem; display: grid; gap: 0.75rem; padding-bottom: 2rem; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.25rem; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; }
+    .en-title { font-weight: bold; font-size: 1.15rem; margin-bottom: 0.25rem;}
+    .fa-title { color: var(--primary-light); font-size: 1.25rem; }
+    .favorite-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; }
+    
+    /* Detail */
+    #detail-view { padding: 1.5rem; }
+    .back-btn { background: none; border: none; color: var(--primary-light); font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; padding: 0; }
+    .detail-card { background: var(--bg-card); border-radius: 1.5rem; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .detail-en { font-size: 1.8rem; font-weight: bold; margin: 0 0 0.5rem 0; }
+    .detail-fa { color: var(--primary-light); font-size: 1.4rem; margin: 0 0 1.5rem 0; font-weight: bold;}
+    .divider { border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .detail-desc { line-height: 1.9; font-size: 1.1rem; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <div id="disclaimerModal" class="hidden">
+    <div class="modal-content">
+      <h2 style="margin-top:0; font-size: 1.5rem;">⚠️ هشدار مهم</h2>
+      <p style="color: var(--text-mut); line-height: 1.8; font-size: 1.1rem;">
+        این اپلیکیشن فقط برای اطلاعات عمومی و آموزشی است.<br>
+        جایگزین نظر پزشک یا داروساز نیست.<br>
+        قبل از مصرف هر دارویی حتماً با متخصص مشورت کنید.
+      </p>
+      <button onclick="acceptDisclaimer()" class="modal-btn">قبول می‌کنم و ادامه می‌دهم</button>
+    </div>
+  </div>
+
+  <div class="max-w">
+    <header>
+      <div>
+        <h1>MedGuide</h1>
+        <p>دانشنامه آفلاین داروهای ایران • ۵۰۰ دارو</p>
+      </div>
+      <button onclick="toggleDarkMode()" class="theme-btn">🌙</button>
+    </header>
+
+    <div id="main-view">
+      <div class="search-container">
+        <input id="searchInput" type="text" placeholder="جستجو به فارسی یا انگلیسی..." autocomplete="off">
+      </div>
+      <div id="medList"></div>
+    </div>
+
+    <div id="detail-view" class="hidden">
+      <button onclick="goBack()" class="back-btn">← بازگشت به لیست</button>
+      <div class="detail-card">
+        <h2 id="det-en" class="detail-en"></h2>
+        <p id="det-fa" class="detail-fa"></p>
+        <div class="divider"></div>
+        <p id="det-desc" class="detail-desc"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
