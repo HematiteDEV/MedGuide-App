@@ -1,16 +1,15 @@
-// متغیر اصلی داروها
-let medications = [];
+// متغیر کمکی برای جلوگیری از تداخل نام
+let allMeds = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // گرفتن داده‌ها از پنجره اصلی (متصل به data.js)
-  medications = window.medications || [];
-  
-  if (medications.length === 0) {
-    console.error("⚠️ داده‌های دارو لود نشد! بررسی کنید که data.js درست لود شده باشد.");
-    const list = document.getElementById('medList');
-    list.innerHTML = `<p style="text-align:center; padding:20px; color:red;">خطا در بارگذاری دیتابیس!</p>`;
+  // خواندن امن داده‌ها
+  allMeds = window.medications || (typeof medications !== 'undefined' ? medications : []);
+
+  if (allMeds.length === 0) {
+    console.error("⚠️ داده‌های دارو لود نشد!");
+    document.getElementById('medList').innerHTML = `<p style="text-align:center; padding:20px; color:red;">خطا در بارگذاری دیتابیس!</p>`;
   } else {
-    renderList(medications);
+    renderList(allMeds);
   }
   
   checkFirstVisit();
@@ -98,3 +97,4 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.error("SW Registration Failed:", err));
 }
+
