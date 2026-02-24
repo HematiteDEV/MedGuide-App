@@ -2,12 +2,11 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MedGuide Offline</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#047857">
   <style>
-    /* متغیرهای رنگی برای حالت روز و شب */
     :root {
       --bg-main: #f4f4f5;
       --bg-card: #ffffff;
@@ -26,130 +25,40 @@
       --primary: #047857;
     }
     
-    body {
-      font-family: Tahoma, Arial, sans-serif;
-      background: var(--bg-main);
-      color: var(--text-main);
-      margin: 0;
-      padding: 0;
-      transition: background 0.3s;
-    }
+    body { font-family: Tahoma, Arial, sans-serif; background: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; transition: background 0.3s; }
     
-    /* ظرف اصلی */
-    .app-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 15px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+    .app-container { max-width: 600px; margin: 0 auto; padding: 15px; min-height: 100vh; display: flex; flex-direction: column; }
     
-    /* استایل سربرگ */
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 1.5rem 1rem;
-      text-align: center;
-      border-radius: 20px;
-      position: relative;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
+    header { background: var(--primary); color: white; padding: 1.5rem 1rem; text-align: center; border-radius: 20px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     header h1 { margin: 0; font-size: 2rem; font-weight: bold; letter-spacing: 1px;}
     header p { margin: 5px 0 0 0; color: #a7f3d0; font-size: 1rem; }
     
-    .theme-btn {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      font-size: 1.6rem;
-      cursor: pointer;
-    }
+    .theme-btn { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.6rem; cursor: pointer; }
+    .install-btn { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: #ffffff; color: var(--primary); border: none; padding: 6px 12px; border-radius: 12px; font-size: 0.9rem; font-weight: bold; cursor: pointer; font-family: Tahoma, sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .install-btn.hidden { display: none !important; }
 
-    /* کادر جستجو */
     .search-container { margin-top: 15px; }
-    input[type="text"] {
-      width: 100%;
-      padding: 1.1rem 1.2rem;
-      font-size: 1.05rem;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-main);
-      box-sizing: border-box;
-      outline: none;
-    }
+    input[type="text"] { width: 100%; padding: 1.1rem 1.2rem; font-size: 1.05rem; border-radius: 18px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); box-sizing: border-box; outline: none; }
     input[type="text"]:focus { border-color: var(--primary-light); }
 
-    /* دکمه‌های فیلتر */
-    .filter-container {
-      display: flex;
-      gap: 8px;
-      margin-top: 15px;
-      overflow-x: auto;
-      padding-bottom: 5px;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .filter-container { display: flex; gap: 8px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; -ms-overflow-style: none; scrollbar-width: none; }
     .filter-container::-webkit-scrollbar { display: none; }
-    .filter-btn {
-      white-space: nowrap;
-      padding: 8px 16px;
-      background: var(--bg-card);
-      color: var(--text-mut);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      cursor: pointer;
-      font-family: Tahoma, sans-serif;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-    }
-    .filter-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
+    .filter-btn { white-space: nowrap; padding: 8px 16px; background: var(--bg-card); color: var(--text-mut); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-family: Tahoma, sans-serif; font-size: 0.95rem; transition: all 0.2s; }
+    .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-    /* لیست داروها */
     #medList { margin-top: 15px; display: grid; gap: 12px; flex-grow: 1; }
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.2rem;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
     .en-title { font-weight: bold; font-size: 1.15rem; }
     .fa-title { color: var(--primary-light); font-size: 1.1rem; margin-top: 5px; }
 
-    /* فوتر توسعه‌دهنده - آپدیت شده به انگلیسی */
-    .dev-footer {
-      text-align: center;
-      margin-top: 35px;
-      padding-top: 15px;
-      padding-bottom: 15px;
-      font-size: 0.95rem;
-      color: var(--text-mut);
-      border-top: 1px dashed var(--border);
-      direction: ltr; /* چپ‌چین کردن متن انگلیسی */
-      font-family: Arial, sans-serif;
-    }
-    .dev-footer a {
-      color: var(--primary-light);
-      text-decoration: none;
-      font-weight: bold;
-    }
+    .dev-footer { text-align: center; margin-top: 35px; padding-top: 15px; padding-bottom: 15px; font-size: 0.95rem; color: var(--text-mut); border-top: 1px dashed var(--border); direction: ltr; font-family: Arial, sans-serif; }
+    .dev-footer a { color: var(--primary-light); text-decoration: none; font-weight: bold; }
     
-    /* صفحه جزئیات دارو */
     .hidden { display: none !important; }
     #detail-view { padding: 10px 0; }
-    .back-btn { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1.1rem; padding: 0;}
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .back-btn { background: none; border: none; color: var(--primary); font-weight: bold; cursor: pointer; font-size: 1.1rem; padding: 0; }
+    .share-btn { background: var(--primary-light); color: white; border: none; padding: 8px 16px; border-radius: 12px; cursor: pointer; font-family: Tahoma, sans-serif; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .detail-box { background: var(--bg-card); padding: 25px; border-radius: 20px; border: 1px solid var(--border); }
   </style>
 </head>
@@ -158,6 +67,7 @@
   <div class="app-container">
     <header>
       <button onclick="toggleDarkMode()" class="theme-btn">🌙</button>
+      <button id="installBtn" onclick="installApp()" class="install-btn hidden">⬇️ نصب اپ</button>
       <h1>MedGuide</h1>
       <p>دانشنامه آفلاین داروهای ایران</p>
     </header>
@@ -186,7 +96,11 @@
     </div>
 
     <div id="detail-view" class="hidden">
-      <button onclick="goBack()" class="back-btn">← بازگشت به لیست</button>
+      <div class="top-bar">
+        <button onclick="goBack()" class="back-btn">← بازگشت به لیست</button>
+        <button onclick="shareMed()" class="share-btn" id="shareBtn">📤 ارسال</button>
+      </div>
+      
       <div class="detail-box">
         <h2 id="det-en" style="margin:0; font-size: 1.8rem;"></h2>
         <p id="det-fa" style="color: var(--primary-light); font-size: 1.4rem; font-weight: bold; margin: 10px 0;"></p>
